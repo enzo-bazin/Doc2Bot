@@ -9,7 +9,7 @@ class user:
         self.password = password
         self.file_ref = file_ref
 
-def add_user(username, password, file_ref=None):
+def add_user(username, password):
     hashed_password = hash_password(password)
     with get_connexion() as conn:
          conn.execute("""
@@ -18,7 +18,7 @@ def add_user(username, password, file_ref=None):
                       username, 
                       password,
                       file_ref) 
-                      VALUES (?, ?, ?, ?)""", (str(uuid4()), username, hashed_password, file_ref))
+                      VALUES (?, ?, ?, ?)""", (str(uuid4()), username, hashed_password, None))
 
 def remove_user(username):
     with get_connexion() as conn:
