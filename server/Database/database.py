@@ -2,7 +2,7 @@ import sqlite3
 from contextlib import contextmanager
 
 @contextmanager
-def get_connexion(path='Database/db/users.db'):
+def get_connexion(path='server/Database/db/users.db'):
     connexion = sqlite3.connect(path)
     try:
         yield connexion

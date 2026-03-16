@@ -1,13 +1,8 @@
-from server.Database.db import get_connexion
+from server.Database.database import get_connexion
 from uuid import uuid4
-from server.Core.security import hash_password
+from server.Core.security.hashage import hash_password
+from server.Utils.UserRegister import user
 
-class user:
-    def __init__(self, user_id, username, password, file_ref=None):
-        self.user_id = user_id
-        self.username = username
-        self.password = password
-        self.file_ref = file_ref
 
 def add_user(username, password):
     hashed_password = hash_password(password)

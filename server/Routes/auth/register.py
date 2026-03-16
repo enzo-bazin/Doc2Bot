@@ -1,13 +1,9 @@
 # Header: register.py
 from fastapi import APIRouter
-from pydantic import BaseModel
 from server.Database.repositories.user_repo import add_user
 from sqlite3 import IntegrityError
 from fastapi import HTTPException
-
-class UserRegister(BaseModel):
-    username: str
-    password: str
+from server.Utils.UserRegister import UserRegister
 
 router = APIRouter()
 

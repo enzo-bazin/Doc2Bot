@@ -10,9 +10,13 @@ sys.path.insert(0, str(project_root))
 from fastapi import FastAPI
 from server.Routes.router import router as main_router
 import uvicorn
+from server.Database.database import init_db
+
+init_db()
 
 app = FastAPI()
 app.include_router(main_router)
+
 
 # Start the server
 uvicorn.run(app, host="0.0.0.0", port=8000)
