@@ -11,10 +11,12 @@ from fastapi import FastAPI
 from server.Routes.router import router as main_router
 import uvicorn
 from server.Database.database import init_db
+from server.Core.handle_event.middleware import AuthentificationMiddleware
 
 init_db()
 
 app = FastAPI()
+app.add_middleware(AuthentificationMiddleware)
 app.include_router(main_router)
 
 
