@@ -11,7 +11,7 @@ load_dotenv()
 router = APIRouter()
 
 @router.post("/auth/login")
-def login(client: UserRegister):
+async def login(client: UserRegister):
     user = get_user(client.username)
     if not user or not verify_password(client.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")

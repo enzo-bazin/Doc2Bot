@@ -4,6 +4,7 @@ from fastapi import HTTPException, Request, Header
 from jose import jwt
 from starlette.responses import JSONResponse
 from dotenv import load_dotenv
+from server.Database.repositories.user_repo import get_user
 import os
 
 load_dotenv()

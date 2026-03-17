@@ -8,7 +8,7 @@ from server.Utils.UserRegister import UserRegister
 router = APIRouter()
 
 @router.post("/auth/register")
-def register(user: UserRegister):
+async def register(user: UserRegister):
     try:
         add_user(user.username, user.password)
         return {"detail": "user registered successfully"}
