@@ -31,5 +31,6 @@ def init_db():
         conn.execute("""
                      CREATE TABLE IF NOT EXISTS sessions (
                      user_id TEXT PRIMARY KEY,
-                     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
+                     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                     status TEXT NOT NULL)
                      """)

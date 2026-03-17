@@ -15,4 +15,6 @@ async def register(user: UserRegister):
     except IntegrityError:
         raise HTTPException(status_code=400, detail="Username already exists")
     except Exception as e:
+        errname = e.__class__.__name__
+        print(f"Error occurred while registering user: {errname}")
         raise HTTPException(status_code=500, detail="Error occurred while registering user") 

@@ -12,7 +12,7 @@ def add_user(username, password):
                       user_id, 
                       username, 
                       password) 
-                      VALUES (?, ?, ?, ?)""", (str(uuid4()), username, hashed_password))
+                      VALUES (?, ?, ?)""", (str(uuid4()), username, hashed_password))
 
 def remove_user(username):
     with get_connexion_to_user_db() as conn:
@@ -28,5 +28,5 @@ def get_user(username):
                                WHERE username = ?""", (username,))
          row = cursor.fetchone()
          if row:
-             return user(row[0], row[1], row[2], row[3])
+             return user(row[0], row[1], row[2])
          return None
