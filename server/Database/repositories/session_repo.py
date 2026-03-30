@@ -1,4 +1,9 @@
 from server.Database.database import get_connexion_to_session_db
+from server.Database.temporary_file.store_temp_file import remove_file
+
+def remove_session_and_files(user_id):
+    remove_file(user_id)
+    remove_session(user_id)
 
 def add_session(user_id, last_seen, status):
     with get_connexion_to_session_db() as conn:
@@ -22,6 +27,12 @@ def get_session(user_id):
                      SELECT * FROM sessions
                      WHERE user_id = ?""", (user_id,))
         return cursor.fetchone()
+
+def get_all_sessions():
+    with get_connexion_to_session_db() as conn:
+        cursor = conn.execute("""
+                     SELECT * FROM sessions""")
+        return cursor.fetchall()
 
 def update_last_seen(user_id, last_seen):
     with get_connexion_to_session_db() as conn:
