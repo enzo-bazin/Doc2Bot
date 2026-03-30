@@ -1,22 +1,20 @@
 # Header: register.py
 from fastapi import APIRouter
-from pydantic import BaseModel
 from server.Database.repositories.user_repo import add_user
 from sqlite3 import IntegrityError
 from fastapi import HTTPException
-
-class UserRegister(BaseModel):
-    username: str
-    password: str
+from server.Utils.UserRegister import UserRegister
 
 router = APIRouter()
 
 @router.post("/auth/register")
-def register(user: UserRegister):
+async def register(user: UserRegister):
     try:
         add_user(user.username, user.password)
         return {"detail": "user registered successfully"}
     except IntegrityError:
         raise HTTPException(status_code=400, detail="Username already exists")
     except Exception as e:
+        errname = e.__class__.__name__
+        print(f"Error occurred while registering user: {errname}")
         raise HTTPException(status_code=500, detail="Error occurred while registering user") 

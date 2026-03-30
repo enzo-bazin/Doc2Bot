@@ -2,3 +2,7 @@ fastapi
 uvicorn
 bcrypt
 python-jose
+python-dotenv
+starlette
+aiofiles
+python-multipart

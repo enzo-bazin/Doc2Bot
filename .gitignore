@@ -1,2 +1,5 @@
 __pycache__
 .venv
+.env
+server/Database/db/*
+server/Database/temporary_file/temp_*
