@@ -1,40 +1,47 @@
 # Header: mainloop.py
 
-import sys
 import asyncio
-from pathlib import Path
-
-from fastapi.concurrency import asynccontextmanager
-
-# Add project root to sys.path
-project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from server.Routes.router import router as main_router
 import uvicorn
+
+from server.Routes.router import router as main_router
 from server.Database.database import init_db
 from server.Core.handle_event.middleware import AuthentificationMiddleware
 from server.Core.handle_clients.session_manager import cleanup_sessions
-
-init_db()
+from server.Utils.constants import settings
 
 async def main_loop():
     while True:
-        await cleanup_sessions()
+        try:
+            await cleanup_sessions()
+        except Exception as e:
+            print(f"Error in cleanup_sessions: {e}")
         await asyncio.sleep(10)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Initialisation de la DB
+    await init_db()
+    # Lancement de la tâche de fond
     task = asyncio.create_task(main_loop())
     yield
     task.cancel()
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
 
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title="Doc2Bot API", lifespan=lifespan)
 app.add_middleware(AuthentificationMiddleware)
 app.include_router(main_router)
 
-
-# Start the server
-uvicorn.run(app, host="0.0.0.0", port=8000)
+if __name__ == "__main__":
+    # Start the server using settings
+    uvicorn.run(
+        "server.Core.mainloop:app", 
+        host=settings.HOST, 
+        port=settings.PORT, 
+        reload=True
+    )

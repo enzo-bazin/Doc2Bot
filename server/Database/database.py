@@ -1,34 +1,30 @@
-import sqlite3
-from contextlib import contextmanager
+import aiosqlite
+from server.Utils.constants import settings
+from contextlib import asynccontextmanager
 
-@contextmanager
-def get_connexion_to_user_db(path='server/Database/db/users.db'):
-    connexion = sqlite3.connect(path)
-    try:
-        yield connexion
-        connexion.commit()
-    finally:
-        connexion.close()
+@asynccontextmanager
+async def get_connexion_to_user_db():
+    async with aiosqlite.connect(settings.USER_DB_PATH) as db:
+        yield db
+        await db.commit()
 
-@contextmanager
-def get_connexion_to_session_db(path='server/Database/db/session.db'):
-    connexion = sqlite3.connect(path)
-    try:
-        yield connexion
-        connexion.commit()
-    finally:
-        connexion.close()
+@asynccontextmanager
+async def get_connexion_to_session_db():
+    async with aiosqlite.connect(settings.SESSION_DB_PATH) as db:
+        yield db
+        await db.commit()
 
-def init_db():
-    with get_connexion_to_user_db() as conn:
-        conn.execute("""
+async def init_db():
+    async with get_connexion_to_user_db() as db:
+        await db.execute("""
                      CREATE TABLE IF NOT EXISTS users (
                      user_id TEXT PRIMARY KEY,
                      username TEXT UNIQUE NOT NULL,
-                     password TEXT NOT NULL)"""
+                     password TEXT NOT NULL,
+                     tokens INTEGER DEFAULT 0)"""
                      )
-    with get_connexion_to_session_db() as conn:
-        conn.execute("""
+    async with get_connexion_to_session_db() as db:
+        await db.execute("""
                      CREATE TABLE IF NOT EXISTS sessions (
                      user_id TEXT PRIMARY KEY,
                      last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

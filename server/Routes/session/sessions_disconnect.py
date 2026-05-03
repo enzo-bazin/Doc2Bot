@@ -1,23 +1,21 @@
 # Header: sessions_disconnect.py
-# Header: session_connexion.py
-from fastapi import APIRouter, BackgroundTasks, Request, HTTPException, UploadFile
-from server.Utils.UserRegister import user
+from fastapi import APIRouter, Request, HTTPException
 from datetime import datetime, timezone
-from server.Database.repositories.session_repo import add_session, remove_session_and_files
+from server.Database.repositories.session_repo import update_status, remove_session_and_files
 
 router = APIRouter()
 
-# Disconnect session
 @router.post("/session/disconnect")
-async def disconnect_session(requests: Request, background_tasks: BackgroundTasks, file: UploadFile):
-    user_id = requests.state.user_id
-    last_seen = datetime.now(timezone.utc)
+async def disconnect_session(request: Request):
+    user_id = getattr(request.state, "user_id", None)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+        
     try:
-        add_session(user_id, last_seen, "disconnected")
-    except:
+        await update_status(user_id, "disconnected")
+        # On peut supprimer immédiatement ou laisser le cleanup s'en charger
+        await remove_session_and_files(user_id)
+        return {"detail": "disconnected successfully"}
+    except Exception as e:
+        print(f"Error disconnecting: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
-    # Add background task to update session status after processing is done
-    background_tasks.add_task(remove_session_and_files, user_id)
-    #background_tasks.add_task(load_client_pdf, user_id)
-    return {"detail": "disconnected from your session..."}
-    

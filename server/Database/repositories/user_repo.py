@@ -4,29 +4,47 @@ from server.Core.security.hashage import hash_password
 from server.Utils.UserRegister import user
 
 
-def add_user(username, password):
+async def add_user(username, password):
     hashed_password = hash_password(password)
-    with get_connexion_to_user_db() as conn:
-         conn.execute("""
+    async with get_connexion_to_user_db() as db:
+         await db.execute("""
                       INSERT INTO users (
                       user_id, 
                       username, 
                       password) 
                       VALUES (?, ?, ?)""", (str(uuid4()), username, hashed_password))
 
-def remove_user(username):
-    with get_connexion_to_user_db() as conn:
-         conn.execute("""
+async def remove_user(username):
+    async with get_connexion_to_user_db() as db:
+         await db.execute("""
                       DELETE FROM users 
                       WHERE username = ?""", (username,))
 
-def get_user(username):
-    with get_connexion_to_user_db() as conn:
-         cursor = conn.execute("""
-                               SELECT user_id, username, password 
+async def get_user(username):
+    async with get_connexion_to_user_db() as db:
+         async with db.execute("""
+                               SELECT user_id, username, password, tokens 
                                FROM users 
-                               WHERE username = ?""", (username,))
-         row = cursor.fetchone()
-         if row:
-             return user(row[0], row[1], row[2])
-         return None
+                               WHERE username = ?""", (username,)) as cursor:
+             row = await cursor.fetchone()
+             if row:
+                 return user(row[0], row[1], row[2], row[3])
+             return None
+
+async def get_user_by_id(user_id):
+    async with get_connexion_to_user_db() as db:
+         async with db.execute("""
+                               SELECT user_id, username, password, tokens 
+                               FROM users 
+                               WHERE user_id = ?""", (user_id,)) as cursor:
+             row = await cursor.fetchone()
+             if row:
+                 return user(row[0], row[1], row[2], row[3])
+             return None
+
+async def update_user_tokens(user_id, new_token_count):
+    async with get_connexion_to_user_db() as db:
+         await db.execute("""
+                      UPDATE users 
+                      SET tokens = ? 
+                      WHERE user_id = ?""", (new_token_count, user_id))
