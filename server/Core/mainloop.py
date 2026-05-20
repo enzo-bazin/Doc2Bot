@@ -8,7 +8,6 @@ import uvicorn
 
 from server.Routes.router import router as main_router
 from server.Database.database import init_db
-from server.Core.handle_event.middleware import AuthentificationMiddleware
 from server.Core.handle_clients.session_manager import cleanup_sessions
 from server.Utils.constants import settings
 
@@ -34,7 +33,6 @@ async def lifespan(app: FastAPI):
         pass
 
 app = FastAPI(title="Doc2Bot API", lifespan=lifespan)
-app.add_middleware(AuthentificationMiddleware)
 app.include_router(main_router)
 
 if __name__ == "__main__":
