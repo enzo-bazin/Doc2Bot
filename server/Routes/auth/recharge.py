@@ -4,7 +4,7 @@ from server.Utils.UserRegister import RechargeRequest
 
 router = APIRouter()
 
-@router.post("/auth/recharge")
+@router.post("/recharge")
 async def recharge_tokens(request: Request, payload: RechargeRequest):
     user_id = getattr(request.state, "user_id", None)
     if not user_id:
